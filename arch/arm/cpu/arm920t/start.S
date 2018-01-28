@@ -79,7 +79,7 @@ copyex:
 	mov	r1, #0xffffffff
 	ldr	r0, =INTMSK
 	str	r1, [r0]
-# if defined(CONFIG_S3C2410)
+# if defined(CONFIG_S3C2410) || defined(CONFIG_S3C2440)
 	ldr	r1, =0x3ff
 	ldr	r0, =INTSUBMSK
 	str	r1, [r0]
@@ -95,7 +95,7 @@ copyex:
 
     /*2.FCLK:HCLK:PCLK = 1:4:8*/
 	ldr	r0, =0x4c000014
-	mov	r1, #0x05;
+	mov	r1, #5
 	str	r1, [r0]
 
 	/*3.如果HDIVN非0，CPU的总线模式应该从“fast bus mode”变为“asynchronous bus mode”*/
@@ -104,16 +104,13 @@ copyex:
     mcr p15, 0, r1, c1, c0, 0       /*写入控制寄存器*/
 
     /*4.设置主频为400MHz*/
+#define S3C2440_MPLL_400Hz ((0x5c<<12)|(1<<4)|(1<<0))
+
     ldr r0, =0x4c000004
-    ldr r1, =((0x5c<<12)|(0x01<<4)|(0x01))
+    ldr r1, =S3C2440_MPLL_400Hz
     str r1, [r0]
 
-	/*5.开启ICACHE*/
-    mrc p15, 0, r0, c1, c0, 0   @ read control reg
-    orr r0, r0, #(1<<12)
-    mcr p15, 0, r0, c1, c0, 0   @ write it back
-
-    /*6.打开led*/
+    /*5.打开led*/
     ldr	r0, =0x56000054
     ldr	r1, =0xEF
     str	r1, [r0]

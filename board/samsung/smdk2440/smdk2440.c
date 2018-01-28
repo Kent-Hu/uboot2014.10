@@ -123,3 +123,18 @@ ulong board_flash_get_legacy(ulong base, int banknum, flash_info_t *info)
 	info->interface = FLASH_CFI_X16;
 	return 1;
 }
+
+
+void DebugLedControl(unsigned char idx,unsigned char status)
+{
+	unsigned long* GPIOF_REGISTER = (unsigned long*)0x56000054;
+    if(1 == status)
+	{
+		*GPIOF_REGISTER &= ~(1<<(4+idx));
+	}
+	else
+	{
+	    *GPIOF_REGISTER |=  1<<(4+idx);
+	}
+}
+

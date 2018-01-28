@@ -82,6 +82,11 @@ clr_gd:
 	sub	sp, sp, #CONFIG_SYS_MALLOC_F_LEN
 	str	sp, [r9, #GD_MALLOC_BASE]
 #endif
+
+    ldr r0,=0x56000054
+	ldr r1,=0x8f
+	str r1,[r0]
+
 	/* mov r0, #0 not needed due to above code */
 	bl	board_init_f
 
