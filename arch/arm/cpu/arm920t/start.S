@@ -66,7 +66,10 @@ copyex:
 #  define pWTCON	0x53000000
 #  define INTMSK	0x4A000008	/* Interrupt-Controller base addresses */
 #  define INTSUBMSK	0x4A00001C
+#  define MPLLCON   0x4C000004 /* 系统主频配置寄存器 */
+#  define UPLLCON   0x4C000008 /* USB频率配置寄存器 */
 #  define CLKDIVN	0x4C000014	/* clock divisor register */
+#  define CAMDIVN   0x4c000018
 # endif
 
 	ldr	r0, =pWTCON
@@ -79,10 +82,14 @@ copyex:
 	mov	r1, #0xffffffff
 	ldr	r0, =INTMSK
 	str	r1, [r0]
-# if defined(CONFIG_S3C2410) || defined(CONFIG_S3C2440)
+# if defined(CONFIG_S3C2410)
 	ldr	r1, =0x3ff
 	ldr	r0, =INTSUBMSK
 	str	r1, [r0]
+# elif defined(CONFIG_S3C2440)
+	ldr r1, =0x7ff
+	ldr r0, =INTSUBMSK
+	str r1, [r0]
 # endif
 
     /*1.Init LED*/
@@ -93,21 +100,43 @@ copyex:
     ldr	r1, =0xAF
     str	r1, [r0]
 
-    /*2.FCLK:HCLK:PCLK = 1:4:8*/
+
+	/*2.set CAMDIVN to 0*/
+    ldr r0, =CAMDIVN
+	mov r1, #0
+	str r1, [r0]
+
+    /*3.FCLK:HCLK:PCLK = 1:4:8*/
 	ldr	r0, =0x4c000014
-	mov	r1, #5
+	mov	r1, #0x05
 	str	r1, [r0]
 
-	/*3.如果HDIVN非0，CPU的总线模式应该从“fast bus mode”变为“asynchronous bus mode”*/
-    mrc p15, 0, r1, c1, c0, 0       /*读出控制寄存器*/
-    orr r1, r1, #0xc0000000         /*设置为“asynchronous bus mode”*/
-    mcr p15, 0, r1, c1, c0, 0       /*写入控制寄存器*/
+	/*3.if HDIVN is not 0, CPU must set sync mode*/
+	mrc p15, 0, r0, c1, c0, 0  
+	orr r0, r0, #0xC0000000  
+	mcr p15, 0, r0, c1, c0, 0 
 
     /*4.设置主频为400MHz*/
-#define S3C2440_MPLL_400Hz ((0x5c<<12)|(1<<4)|(1<<0))
+# define MMDIV_405 (0x7f<<12)  
+# define MPSDIV_405 0x21  
+# define UMDIV_48 (0x38<<12)  
+# define UPSDIV_48 0X22 
 
-    ldr r0, =0x4c000004
-    ldr r1, =S3C2440_MPLL_400Hz
+    ldr r0, =UPLLCON  
+    mov r1, #UMDIV_48 /* USB时钟48MHz */  
+    add r1, r1, #UPSDIV_48  
+    str r1, [r0]  
+    
+    nop             
+    nop             
+    nop             
+    nop             
+    nop             
+    nop             
+    nop             
+    ldr r0, =MPLLCON  
+    mov r1, #MMDIV_405 /* cpu时钟 400MHz */  
+    add r1, r1, #MPSDIV_405  
     str r1, [r0]
 
     /*5.打开led*/

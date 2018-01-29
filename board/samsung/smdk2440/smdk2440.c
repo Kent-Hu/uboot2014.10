@@ -52,13 +52,13 @@ int board_early_init_f(void)
 
 	/* some delay between MPLL and UPLL */
 	pll_delay(4000); 
-#endif
 	
 	/* configure UPLL */
 	writel((U_M_MDIV << 12) + (U_M_PDIV << 4) + U_M_SDIV,
 	       &clk_power->upllcon);
 	/* some delay between MPLL and UPLL */
 	pll_delay(8000);
+#endif
 
 	/* set up the I/O ports */
 	writel(0x007FFFFF, &gpio->gpacon);

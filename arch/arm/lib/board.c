@@ -98,6 +98,10 @@ inline void __blue_led_off(void) {}
 static int init_baudrate(void)
 {
 	gd->baudrate = getenv_ulong("baudrate", 10, CONFIG_BAUDRATE);
+	if(gd->baudrate == 115200)
+	{
+		DebugLedControl(1,0);
+	}
 	return 0;
 }
 
@@ -284,7 +288,8 @@ void board_init_f(ulong bootflag)
 	/* Allow the early environment to override the fdt address */
 	gd->fdt_blob = (void *)getenv_ulong("fdtcontroladdr", 16,
 						(uintptr_t)gd->fdt_blob);
-
+    
+	DebugLedControl(0,0);
 	for (init_fnc_ptr = init_sequence; *init_fnc_ptr; ++init_fnc_ptr) {
 		if ((*init_fnc_ptr)() != 0) {
 			hang ();
