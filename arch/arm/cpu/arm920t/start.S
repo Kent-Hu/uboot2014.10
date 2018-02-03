@@ -12,11 +12,6 @@
 #include <common.h>
 #include <config.h>
 
-#define LED1_POS     4
-#define LED2_POS     5
-#define LED3_POS     6
-
-
 /*
  *************************************************************************
  *
@@ -58,92 +53,44 @@ copyex:
 #ifdef CONFIG_S3C24X0
 	/* turn off the watchdog */
 
-# if defined(CONFIG_S3C2400)
-#  define pWTCON	0x15300000
-#  define INTMSK	0x14400008	/* Interrupt-Controller base addresses */
-#  define CLKDIVN	0x14800014	/* clock divisor register */
-#else
-#  define pWTCON	0x53000000
-#  define INTMSK	0x4A000008	/* Interrupt-Controller base addresses */
-#  define INTSUBMSK	0x4A00001C
-#  define MPLLCON   0x4C000004 /* 系统主频配置寄存器 */
-#  define UPLLCON   0x4C000008 /* USB频率配置寄存器 */
-#  define CLKDIVN	0x4C000014	/* clock divisor register */
-#  define CAMDIVN   0x4c000018
-# endif
+#define pWTCON	    0x53000000
+#define INTMSK	    0x4A000008	/* Interrupt-Controller base addresses */
+#define INTSUBMSK	0x4A00001C
+#define S3C2440_MPLL_400MHZ    ((0x5c<<12)|(0x01<<4)|(0x01))
+
 
 	ldr	r0, =pWTCON
 	mov	r1, #0x0
 	str	r1, [r0]
 
-	/*
-	 * mask all IRQs by setting all bits in the INTMR - default
-	 */
 	mov	r1, #0xffffffff
 	ldr	r0, =INTMSK
 	str	r1, [r0]
-# if defined(CONFIG_S3C2410)
-	ldr	r1, =0x3ff
-	ldr	r0, =INTSUBMSK
-	str	r1, [r0]
-# elif defined(CONFIG_S3C2440)
+
 	ldr r1, =0x7ff
 	ldr r0, =INTSUBMSK
 	str r1, [r0]
-# endif
 
-    /*1.Init LED*/
-    ldr	r0, =0x56000050
-    ldr	r1, =0x1500
-    str	r1, [r0]
-    ldr	r0, =0x56000054
-    ldr	r1, =0xAF
-    str	r1, [r0]
-
-
-	/*2.set CAMDIVN to 0*/
-    ldr r0, =CAMDIVN
+	/*set CAMDIVN to 0*/
+    ldr r0, =0x4c000018
 	mov r1, #0
 	str r1, [r0]
 
-    /*3.FCLK:HCLK:PCLK = 1:4:8*/
+    /*FCLK:HCLK:PCLK = 1:4:8*/
 	ldr	r0, =0x4c000014
-	mov	r1, #0x05
+	mov	r1, #0x05;
 	str	r1, [r0]
 
-	/*3.if HDIVN is not 0, CPU must set sync mode*/
-	mrc p15, 0, r0, c1, c0, 0  
-	orr r0, r0, #0xC0000000  
-	mcr p15, 0, r0, c1, c0, 0 
+	/*if HDIVN is not 0, CPU must set sync mode*/
+	mrc p15, 0, r1, c1, c0, 0  
+	orr r1, r1, #0xC0000000  
+	mcr p15, 0, r1, c1, c0, 0 
 
-    /*4.设置主频为400MHz*/
-# define MMDIV_405 (0x7f<<12)  
-# define MPSDIV_405 0x21  
-# define UMDIV_48 (0x38<<12)  
-# define UPSDIV_48 0X22 
-
-    ldr r0, =UPLLCON  
-    mov r1, #UMDIV_48 /* USB时钟48MHz */  
-    add r1, r1, #UPSDIV_48  
+    /*set main clock to 400MHz*/
+    ldr r0, =0x4C000004  
+    ldr r1, =S3C2440_MPLL_400MHZ
     str r1, [r0]  
     
-    nop             
-    nop             
-    nop             
-    nop             
-    nop             
-    nop             
-    nop             
-    ldr r0, =MPLLCON  
-    mov r1, #MMDIV_405 /* cpu时钟 400MHz */  
-    add r1, r1, #MPSDIV_405  
-    str r1, [r0]
-
-    /*5.打开led*/
-    ldr	r0, =0x56000054
-    ldr	r1, =0xEF
-    str	r1, [r0]
-
 #endif	/* CONFIG_S3C24X0 */
 
 	/*
