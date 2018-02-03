@@ -350,6 +350,27 @@ static const struct amd_flash_info jedec_table[] = {
 		}
 	},
 #endif
+#ifdef CONFIG_SYS_FLASH_LEGACY_1024Kx16
+{
+		.mfr_id		= (u16)MX_MANUFACT,
+		.dev_id		= AM29LV160DB,
+		.name		= "MX AM29LV16DB",
+		.uaddr		= {
+			[1] = MTD_UADDR_0x0555_0x02AA /* x16 */
+		},
+		.DevSize	= SIZE_2MiB,
+		.CmdSet		= CFI_CMDSET_AMD_LEGACY,
+		.NumEraseRegions= 4,
+		.regions	= {
+			ERASEINFO(16*1024,  1),
+			ERASEINFO(8*1024,   2),
+			ERASEINFO(32*1024,  1),
+			ERASEINFO(64*1024, 31),
+		}
+	}
+
+
+#endif
 };
 
 static inline void fill_info(flash_info_t *info, const struct amd_flash_info *jedec_entry, ulong base)
