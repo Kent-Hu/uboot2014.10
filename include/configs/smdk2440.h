@@ -37,13 +37,16 @@
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG
 
-/*
- * Hardware drivers
- */
+#if 0
 #define CONFIG_CS8900		/* we have a CS8900 on-board */
 #define CONFIG_CS8900_BASE	0x19000300
 #define CONFIG_CS8900_BUS16	/* the Linux driver does accesses as shorts */
-
+#else
+#define CONFIG_DRIVER_DM9000
+#define CONFIG_DM9000_BASE	0x20000000
+#define DM9000_IO           CONFIG_DM9000_BASE
+#define DM9000_DATA         (CONFIG_DM9000_BASE+4)
+#endif
 /*
  * select serial console configuration
  */

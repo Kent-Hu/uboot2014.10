@@ -37,7 +37,6 @@ int	arch_early_init_r(void);
 /* board/.../... */
 int	board_init(void);
 int	dram_init (void);
-void DebugLedControl(unsigned char idx,unsigned char status);
 void	dram_init_banksize (void);
 
 /* cpu/.../interrupt.c */
