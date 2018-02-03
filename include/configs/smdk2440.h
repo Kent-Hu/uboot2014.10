@@ -22,7 +22,11 @@
 #define CONFIG_S3C2440		/* specifically a SAMSUNG S3C2410 SoC */
 #define CONFIG_SMDK2440		/* on a SAMSUNG SMDK2410 Board */
 
+#if 0
 #define CONFIG_SYS_TEXT_BASE	0x33f80000
+#else
+#define CONFIG_SYS_TEXT_BASE    0x0
+#endif
 
 #define CONFIG_SYS_ARM_CACHE_WRITETHROUGH
 

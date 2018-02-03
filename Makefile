@@ -184,7 +184,7 @@ export	HOSTARCH HOSTOS
 
 ########################################################################
 ARCH = arm
-CROSS_COMPILE ?= arm-linux-gnueabi-
+CROSS_COMPILE ?= arm-linux-
 
 # set default to nothing for native builds
 ifeq ($(HOSTARCH),$(ARCH))
