@@ -365,7 +365,7 @@ static const struct amd_flash_info jedec_table[] = {
 			ERASEINFO(16*1024,  1),
 			ERASEINFO(8*1024,   2),
 			ERASEINFO(32*1024,  1),
-			ERASEINFO(64*1024, 31),
+			ERASEINFO(64*1024, 31),  /*this message can be seed in the nor flash's datasheet*/
 		}
 	}
 
