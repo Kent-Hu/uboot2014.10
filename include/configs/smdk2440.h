@@ -55,17 +55,21 @@
 
 /************************************************************
  * USB support (currently only works with D-cache off)
- ************************************************************/
+************************************************************/
+#if 0
 #define CONFIG_USB_OHCI
 #define CONFIG_USB_OHCI_S3C24XX
 #define CONFIG_USB_KEYBOARD
 #define CONFIG_USB_STORAGE
 #define CONFIG_DOS_PARTITION
+#endif
 
 /************************************************************
  * RTC
  ************************************************************/
+#if 0
 #define CONFIG_RTC_S3C24X0
+#endif
 
 
 #define CONFIG_BAUDRATE		115200
@@ -85,13 +89,20 @@
 
 #define CONFIG_CMD_BSP
 #define CONFIG_CMD_CACHE
+
+#if 0
 #define CONFIG_CMD_DATE
+#endif
+
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_ELF
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_REGINFO
+
+#if 0
 #define CONFIG_CMD_USB
+#endif
 
 #define CONFIG_SYS_HUSH_PARSER
 #define CONFIG_CMDLINE_EDITING
@@ -103,8 +114,10 @@
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
 #define CONFIG_NETMASK		255.255.255.0
-#define CONFIG_IPADDR		10.0.0.110
-#define CONFIG_SERVERIP		10.0.0.1
+#define CONFIG_IPADDR		192.168.1.110
+#define CONFIG_SERVERIP		192.168.1.100
+#define CONFIG_ETHADDR      08:00:3e:26:0a:5b
+
 
 #if defined(CONFIG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	115200	/* speed to run kgdb serial port */
@@ -114,7 +127,7 @@
  * Miscellaneous configurable options
  */
 #define CONFIG_SYS_LONGHELP		/* undef to save memory */
-#define CONFIG_SYS_PROMPT	"SMDK2410 # "
+#define CONFIG_SYS_PROMPT	"SMDK2440 # "
 #define CONFIG_SYS_CBSIZE	256
 /* Print Buffer Size */
 #define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + \
@@ -187,6 +200,7 @@
 /*
  * File system
  */
+#if 0
 #define CONFIG_CMD_FAT
 #define CONFIG_CMD_EXT2
 #define CONFIG_CMD_UBI
@@ -196,6 +210,7 @@
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_YAFFS2
 #define CONFIG_RBTREE
+#endif
 
 /* additions for new relocation code, must be added to all boards */
 #define CONFIG_SYS_SDRAM_BASE	PHYS_SDRAM_1
