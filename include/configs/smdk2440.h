@@ -118,6 +118,8 @@
 #define CONFIG_SERVERIP		192.168.1.100
 #define CONFIG_ETHADDR      08:00:3e:26:0a:5b
 
+#define CONFIG_BOOTARGS     "console=ttySAC0 root=/dev/mtdblock3"
+#define CONFIG_BOOTCOMMAND  "nand read 30000000 kernel;bootm 30000000"
 
 #if defined(CONFIG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	115200	/* speed to run kgdb serial port */
@@ -172,11 +174,19 @@
 #define CONFIG_SYS_FLASH_BANKS_LIST     { CONFIG_SYS_FLASH_BASE }
 #define CONFIG_SYS_MAX_FLASH_SECT	(50)
 
+#if 0
 #define CONFIG_ENV_ADDR			(CONFIG_SYS_FLASH_BASE + 0x070000)
 #define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SIZE			0x10000
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
+#endif
+
+#define CONFIG_ENV_IS_IN_NAND
+#define CONFIG_ENV_OFFSET        0x00040000          /*256k*/
+#define CONFIG_ENV_ADDR          CONFIG_ENV_OFFSET
+#define CONFIG_ENV_SIZE          0x20000             /*128k*/
+#define CONFIG_ENV_RANGE         CONFIG_ENV_SIZE
 
 /*
  * Size of malloc() pool
@@ -218,5 +228,5 @@
 				GENERATED_GBL_DATA_SIZE)
 
 #define CONFIG_BOARD_EARLY_INIT_F
-
+#define CONFIG_SYS_GENERIC_BOARD     /*remove some printf information*/
 #endif /* __CONFIG_H */

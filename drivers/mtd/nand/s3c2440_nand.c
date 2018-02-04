@@ -47,48 +47,42 @@ static void nand_read_buf(struct mtd_info *mtd, u_char *buf, int len)
 }
 #endif
 
-static void s3c2440_hwcontrol(struct mtd_info *mtd, int cmd, unsigned int ctrl)
+static void s3c2440_hwcontrol(struct mtd_info *mtd, int dat, unsigned int ctrl)
 {
 	struct nand_chip *chip = mtd->priv;
 	struct s3c2440_nand *nand = s3c2440_get_base_nand();
 
-	debug("hwcontrol(): 0x%02x 0x%02x\n", cmd, ctrl);
-
-	if (ctrl & NAND_CTRL_CHANGE) {
-		ulong IO_ADDR_W = (ulong)nand;
-
-		if (!(ctrl & NAND_CLE))
-			IO_ADDR_W |= S3C2440_ADDR_NCLE;
-		if (!(ctrl & NAND_ALE))
-			IO_ADDR_W |= S3C2440_ADDR_NALE;
-
-		chip->IO_ADDR_W = (void *)IO_ADDR_W;
-
-		if (ctrl & NAND_NCE)
-			writel(readl(&nand->nfcont) & ~S3C2440_NFCONT_EN,
-			       &nand->nfcont);
-		else
-			writel(readl(&nand->nfcont) | S3C2440_NFCONT_EN,
-			       &nand->nfcont);
+    if(ctrl & NAND_CLE)
+    {
+        /*send command*/
+		writeb(dat,&nand->nfcmd);
+    }
+	else if(ctrl & NAND_ALE)
+	{
+	    /*send data*/
+		writeb(dat,&nand->nfaddr);
 	}
-
-	if (cmd != NAND_CMD_NONE)
-		writeb(cmd, chip->IO_ADDR_W);
 }
 
-void s3c2440_select_chip(struct mtd_info *mtd, int chipnr)
+
+
+void s3c2440_nand_select(struct mtd_info *mtd, int chipnr)
 {
 	struct nand_chip *chip = mtd->priv;
 	struct s3c2440_nand *nand_reg = s3c2440_get_base_nand();
 
-	if(chipnr == 0)/*selected*/
-	{
-	    nand_reg->nfcont &= ~(1 << 1);
-	}
-	else 
-	{
-	    nand_reg->nfcont |=  (1 << 1);
-	}
+    switch(chipnr)
+    {
+        case -1:
+			nand_reg->nfcont |= (1<<1);    /*cancel the selected*/
+			break;
+		case 0:
+			nand_reg->nfcont &= ~(1<<1);   /*selected*/
+			break;
+		default:
+			BUG();
+			
+    }
 }
 
 static int s3c2440_dev_ready(struct mtd_info *mtd)
@@ -98,39 +92,6 @@ static int s3c2440_dev_ready(struct mtd_info *mtd)
 	return readl(&nand->nfstat) & 0x01;
 }
 
-#ifdef CONFIG_S3C2440_NAND_HWECC
-void s3c2440_nand_enable_hwecc(struct mtd_info *mtd, int mode)
-{
-	struct s3c2440_nand *nand = s3c2440_get_base_nand();
-	debug("s3c2440_nand_enable_hwecc(%p, %d)\n", mtd, mode);
-	writel(readl(&nand->nfconf) | S3C2440_NFCONF_INITECC, &nand->nfconf);
-}
-
-static int s3c2440_nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
-				      u_char *ecc_code)
-{
-	struct s3c2440_nand *nand = s3c2440_get_base_nand();
-	ecc_code[0] = readb(&nand->nfecc);
-	ecc_code[1] = readb(&nand->nfecc + 1);
-	ecc_code[2] = readb(&nand->nfecc + 2);
-	debug("s3c2440_nand_calculate_hwecc(%p,): 0x%02x 0x%02x 0x%02x\n",
-	       mtd , ecc_code[0], ecc_code[1], ecc_code[2]);
-
-	return 0;
-}
-
-static int s3c2440_nand_correct_data(struct mtd_info *mtd, u_char *dat,
-				     u_char *read_ecc, u_char *calc_ecc)
-{
-	if (read_ecc[0] == calc_ecc[0] &&
-	    read_ecc[1] == calc_ecc[1] &&
-	    read_ecc[2] == calc_ecc[2])
-		return 0;
-
-	printf("s3c2440_nand_correct_data: not implemented\n");
-	return -1;
-}
-#endif
 
 int board_nand_init(struct nand_chip *nand)
 {
@@ -154,15 +115,18 @@ int board_nand_init(struct nand_chip *nand)
 	twrph1 = 8;
 #endif
 
-//	cfg = S3C2440_NFCONF_EN;
+#if 0
+	cfg = S3C2440_NFCONF_EN;
 	cfg  = S3C2440_NFCONF_TACLS(tacls - 1);
 	cfg |= S3C2440_NFCONF_TWRPH0(twrph0 - 1);
 	cfg |= S3C2440_NFCONF_TWRPH1(twrph1 - 1);
+#endif
+    cfg = ((tacls-1)<<12) | ((twrph0-1)<<8) | ((twrph1-1)<<4);
 	writel(cfg, &nand_reg->nfconf);
 
     /*enable nandflash controller,Initialize ECC decoder/encoder,Force nFCE to high(Disable chip select)
 	 */
-	writel((1<<0)|(1<<4)|(1<<1),&nand_reg->nfcont);    
+	writel((1<<4)|(1<<1)|(1<<0),&nand_reg->nfcont);    
 	
 	
 	/* initialize nand_chip data structure */
@@ -171,7 +135,7 @@ int board_nand_init(struct nand_chip *nand)
 
     /* because above is disable chip select,so we should implement the select function
 	 */
-	nand->select_chip = s3c2440_select_chip;
+	nand->select_chip = s3c2440_nand_select;
 
 	/* read_buf and write_buf are default */
 	/* read_byte and write_byte are default */
