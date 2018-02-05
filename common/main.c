@@ -58,6 +58,13 @@ void main_loop(void)
 	const char *s;
 
 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
+#ifdef CONFIG_CMD_MTDPARTS
+    if (!getenv("mtdparts"))
+    {
+        puts("mtdparts env not found\r\n");
+        run_command("mtdparts default", 0);
+    }
+#endif
 
 #ifndef CONFIG_SYS_GENERIC_BOARD
 	puts("Warning: Your board does not use generic board. Please read\n");

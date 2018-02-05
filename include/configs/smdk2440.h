@@ -104,7 +104,10 @@
 #define CONFIG_CMD_USB
 #endif
 
+#if 0
 #define CONFIG_SYS_HUSH_PARSER
+#endif
+
 #define CONFIG_CMDLINE_EDITING
 
 /* autoboot */
@@ -187,6 +190,15 @@
 #define CONFIG_ENV_ADDR          CONFIG_ENV_OFFSET
 #define CONFIG_ENV_SIZE          0x20000             /*128k*/
 #define CONFIG_ENV_RANGE         CONFIG_ENV_SIZE
+
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_DEVICE       /* needed for mtdparts commands */
+#define MTDIDS_DEFAULT       "nand0=jz2440-0" /*which partion*/
+#define MTDPARTS_DEFAULT     "mtdparts=jz2440-0:512k(u-boot),"\
+						     "128k(params),"\
+						     "2m(kernel),"  \
+						     "-(rootfs)"
+ 
 
 /*
  * Size of malloc() pool
