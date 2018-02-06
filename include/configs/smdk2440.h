@@ -200,6 +200,10 @@
 						     "-(rootfs)"
  
 
+
+#define CONFIG_CMD_NAND_YAFFS
+
+
 /*
  * Size of malloc() pool
  * BZIP2 / LZO / LZMA need a lot of RAM
