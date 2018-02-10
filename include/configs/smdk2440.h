@@ -194,9 +194,9 @@
 #define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_DEVICE       /* needed for mtdparts commands */
 #define MTDIDS_DEFAULT       "nand0=jz2440-0" /*which partion*/
-#define MTDPARTS_DEFAULT     "mtdparts=jz2440-0:512k(u-boot),"\
+#define MTDPARTS_DEFAULT     "mtdparts=jz2440-0:256k(u-boot),"\
 						     "128k(params),"\
-						     "2m(kernel),"  \
+						     "4m(kernel),"  \
 						     "-(rootfs)"
  
 
