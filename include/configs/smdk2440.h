@@ -33,9 +33,16 @@
 /* input clock of PLL (the SMDK2410 has 12MHz input clock) */
 #define CONFIG_SYS_CLK_FREQ	12000000
 
+
+/*modify by kent:remove tags, and support device tree*/
+#if 0
 #define CONFIG_CMDLINE_TAG	/* enable passing of ATAGs */
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_INITRD_TAG
+#else
+#define CONFIG_OF_LIBFDT	     1
+#endif
+
 
 #if 0
 #define CONFIG_CS8900		/* we have a CS8900 on-board */
@@ -121,8 +128,11 @@
 #define CONFIG_SERVERIP		192.168.1.100
 #define CONFIG_ETHADDR      08:00:3e:26:0a:5b
 
+#if 0
 #define CONFIG_BOOTARGS     "console=ttySAC0 root=/dev/mtdblock3"
-#define CONFIG_BOOTCOMMAND  "nand read 30000000 kernel;bootm 30000000"
+#endif
+
+#define CONFIG_BOOTCOMMAND  "nand read 30000000 kernel;nand read 31000000 dts;bootm 30000000 - 31000000"
 
 #if defined(CONFIG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	115200	/* speed to run kgdb serial port */
@@ -197,6 +207,7 @@
 #define MTDPARTS_DEFAULT     "mtdparts=jz2440-0:256k(u-boot),"\
 						     "128k(params),"\
 						     "4m(kernel),"  \
+							 "128k(dts),"    \
 						     "-(rootfs)"
  
 
